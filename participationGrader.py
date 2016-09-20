@@ -11,6 +11,21 @@ import tkinter as tk
 from tkinter import filedialog
 
 
+#create necessary objects to produce File Open Dialog
+root = tk.Tk()
+root.withdraw()
+opts = {}
+opts['filetypes'] = [('TXT Files','.txt'),('all files','.*')]
+
+
+#read answer key from given file
+try:
+    keyFile = open(filedialog.askopenfilename(title="Scoring Rubric for Surveys",**opts), "r")
+except:
+    print("Failed to open scoring rubric file! Exiting...")
+    sys.exit()
+
+
 
 # AnswerKey ==> List of Tuples
 #                   Each Tuple is the type of question and
@@ -44,15 +59,12 @@ print("Welcome to the PTS Participation Grader Mk.I")
 print("============================================\n")
 
 
-root = tk.Tk()
-root.withdraw()
 opts = {}
 opts['filetypes'] = [('CSV Files','.csv'),('all files','.*')]
 
 #attempt to open the given file
 #filename = input("Enter your participation survey CSV file:")
-filename = filedialog.askopenfilename(title="Survey File to Grade")
-
+filename = filedialog.askopenfilename(title="Survey File to Grade", **opts)
 
 try:
     surveyFile = open(filename, "r")
