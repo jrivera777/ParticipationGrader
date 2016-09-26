@@ -14,18 +14,32 @@ from tkinter import filedialog
 #create necessary objects to produce File Open Dialog
 root = tk.Tk()
 root.withdraw()
-opts = {}
-opts['filetypes'] = [('TXT Files','.txt'),('all files','.*')]
 
+def loadAnswerKey():
+    opts = {}
+    opts['filetypes'] = [('TXT Files','.txt'),('all files','.*')]
 
-#read answer key from given file
-try:
-    keyFile = open(filedialog.askopenfilename(title="Scoring Rubric for Surveys",**opts), "r")
-except:
-    print("Failed to open scoring rubric file! Exiting...")
-    sys.exit()
+    global answerKey
+    answerKey = []
+    #read answer key file
+    try:
+        keyFile = open(filedialog.askopenfilename(title="Scoring Rubric for Surveys",**opts), "r")
+    except: 
+        print("Failed to open scoring rubric file! Exiting...")
+        sys.exit()
+        
+        #generate answer key list
 
-
+    for line in keyFile:
+        quest = line.strip().split("-")
+        ansDict = {};
+        keys = quest[1].split(",")
+        for ans in keys:
+            key = ans.split(":")
+            ansDict[key[0]] = int(key[1])
+        pair = (quest[0], ansDict)
+        answerKey.append(pair)
+   
 
 # AnswerKey ==> List of Tuples
 #                   Each Tuple is the type of question and
@@ -34,11 +48,11 @@ except:
 # mc ==> Multiple choice - have 1 or more answers, each with a numeric grade value.
 # sc ==> Scale of 1-10 - mult key with numeric value that can be multiplied by the given scale value.
 
-answerKey = [("mc", {"lead":20, "shared":20, "often":15, "once":10, "not":5 }),
-               ("mc", {"lead":20, "shared":20, "often":15, "sometimes":10, "not":5}),
-               ("sc", {"mult":2}),
-               ("mc", {"always":20, "usually":15, "seem":10, "unwilling":5}),
-               ("mc", {"easily":20, "most":15, "some":10, "unable":5})]
+# answerKey = [("mc", {"lead":20, "shared":20, "often":15, "once":10, "not":5 }),
+#                ("mc", {"lead":20, "shared":20, "often":15, "sometimes":10, "not":5}),
+#                ("sc", {"mult":2}),
+#                ("mc", {"always":20, "usually":15, "seem":10, "unwilling":5}),
+#                ("mc", {"easily":20, "most":15, "some":10, "unable":5})]
 
 def clean(str):
     return str.lower().strip()
@@ -57,6 +71,12 @@ def displayGrades(results):
 
 print("Welcome to the PTS Participation Grader Mk.I")
 print("============================================\n")
+
+#ask for rubric file and generate an answer key
+loadAnswerKey()
+
+for a in answerKey:
+    print(a)
 
 
 opts = {}
@@ -103,4 +123,3 @@ for response in surveys:
 
 surveyFile.close()
 displayGrades(surveyResults)
-
