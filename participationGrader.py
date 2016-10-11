@@ -9,36 +9,9 @@ import sys
 import csv
 import tkinter as tk
 from tkinter import filedialog
+from GraderWindow import GraderWindow
 
 
-#create necessary objects to produce File Open Dialog
-root = tk.Tk()
-root.withdraw()
-
-def loadAnswerKey():
-    opts = {}
-    opts['filetypes'] = [('TXT Files','.txt'),('all files','.*')]
-
-    global answerKey
-    answerKey = []
-    #read answer key file
-    try:
-        keyFile = open(filedialog.askopenfilename(title="Scoring Rubric for Surveys",**opts), "r")
-    except: 
-        print("Failed to open scoring rubric file! Exiting...")
-        sys.exit()
-        
-        #generate answer key list
-
-    for line in keyFile:
-        quest = line.strip().split("-")
-        ansDict = {};
-        keys = quest[1].split(",")
-        for ans in keys:
-            key = ans.split(":")
-            ansDict[key[0]] = int(key[1])
-        pair = (quest[0], ansDict)
-        answerKey.append(pair)
    
 
 # AnswerKey ==> List of Tuples
@@ -47,6 +20,7 @@ def loadAnswerKey():
 #
 # mc ==> Multiple choice - have 1 or more answers, each with a numeric grade value.
 # sc ==> Scale of 1-10 - mult key with numeric value that can be multiplied by the given scale value.
+# fr ==> Free response - optional text
 
 # answerKey = [("mc", {"lead":20, "shared":20, "often":15, "once":10, "not":5 }),
 #                ("mc", {"lead":20, "shared":20, "often":15, "sometimes":10, "not":5}),
@@ -54,72 +28,14 @@ def loadAnswerKey():
 #                ("mc", {"always":20, "usually":15, "seem":10, "unwilling":5}),
 #                ("mc", {"easily":20, "most":15, "some":10, "unable":5})]
 
-def clean(str):
-    return str.lower().strip()
 
-# DisplayGrades - displays partner grades calculated with described answer key.
-#   Input - list of 3-tuples
-def displayGrades(results):
-    for username, partner, grading in results:
-        grade = 0
-        for k, v in grading.items():
-            grade += v
-
-        print(username.replace("@palmertrinity.org", ""), " - ",partner + "'s grade: ",grade)
 
 #=========Program Start=========
 
-print("Welcome to the PTS Participation Grader Mk.I")
-print("============================================\n")
+if __name__ == "__main__":
+    app = GraderWindow()
+    app.mainloop()
 
-#ask for rubric file and generate an answer key
-loadAnswerKey()
+    #setup main GUI window
+    mainWindow = tk.Tk()
 
-for a in answerKey:
-    print(a)
-
-
-opts = {}
-opts['filetypes'] = [('CSV Files','.csv'),('all files','.*')]
-
-#attempt to open the given file
-#filename = input("Enter your participation survey CSV file:")
-filename = filedialog.askopenfilename(title="Survey File to Grade", **opts)
-
-try:
-    surveyFile = open(filename, "r")
-except:
-    print("Failed to open survey file! Exiting...")
-    sys.exit()
-
-surveys = csv.reader(surveyFile)
-headings = surveys.__next__()
-surveyResults = []
-
-#don't include the timestamp, username, and partner name in calculating the grade
-headings.pop(0)
-headings.pop(0)
-headings.pop(0)
-
-for response in surveys:
-    student = {}
-    tstamp = clean(response.pop(0))
-    username = clean(response.pop(0))
-    partner = clean(response.pop(0))
-
-    #calculate the grade for each response
-    for i in range(len(response)):
-        qst = answerKey[i]
-        if qst[0] == "mc": #handle multiple choice questions
-            answers = qst[1]
-            for k, v in answers.items(): #find the matching answer and 
-                if k in clean(response[i]):
-                    student[clean(headings[i])] = v
-        elif qst[0] == "sc": #handle question that uses scale (1 - 10)
-            student[clean(headings[i])] = int(qst[1]["mult"]) * int(response[i]) #scale factor * selected scale value
-    
-    gradeSheet = (username, partner, student)
-    surveyResults.append(gradeSheet)
-
-surveyFile.close()
-displayGrades(surveyResults)

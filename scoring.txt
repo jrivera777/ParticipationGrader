@@ -3,3 +3,4 @@ mc-lead:20,shared:20,often:15,sometimes:10,not:5
 sc-mult:2
 mc-always:20,usually:20,seem:15,once:10,unwilling:5
 mc-easily:20,most:20,some:15,once:10,unable:5
+fr-None
