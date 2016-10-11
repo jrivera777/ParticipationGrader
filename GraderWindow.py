@@ -114,11 +114,13 @@ class GraderWindow(tk.Frame):
     # DisplayGrades - displays partner grades calculated with described answer key.
     #   Input - list of 3-tuples
     def displayGrades(self, results):
+        self.outputText.delete("1.0", "end")
         for username, partner, grading in results:
             grade = 0
             for k, v in grading.items():
                 grade += v
-            print(username.replace("@palmertrinity.org", ""), " - ",partner + "'s grade: ",grade)
+            out = username.replace("@palmertrinity.org", "") + " - " + partner + "'s grade: " + str(grade) + "\n"
+            self.outputText.insert("end", out)
         
         
 
@@ -126,16 +128,19 @@ class GraderWindow(tk.Frame):
         self.master.title("PTS Robotics Partner Participation Survey Grader")
         self.master.geometry("600x400")
 
+        self.scrollbar = tk.Scrollbar(self)
         self.titleLabel = tk.Label(self, text="Welcome to the PTS Participation Grader Mk.I\n============================================\n")
-
         self.loadRubricBtn = tk.Button(self, text="Load Grading Rubric", command=self.loadAKCallback)
         self.rubricFileLabel = tk.Label(self)
         self.loadSurveyBtn = tk.Button(self, text="Load Survey Results", state="disabled", command=self.loadSurveysCallback)
+        self.outputText = tk.Text(self)
 
         self.titleLabel.pack()
         self.loadRubricBtn.pack()
         self.rubricFileLabel.pack()
         self.loadSurveyBtn.pack()
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.outputText.configure(yscrollcommand=self.scrollbar.set)
+        self.outputText.pack()
+        self.scrollbar.configure(command=self.outputText.yview)    
 
-    
-    
