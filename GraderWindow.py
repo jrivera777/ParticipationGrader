@@ -70,10 +70,10 @@ class GraderWindow(tk.Frame):
                     for k, v in answers.items(): #find the matching answer and 
                         if k in self.clean(response[i]):
                             student[self.clean(headings[i])] = v
-                        elif qst[0] == "sc": #handle question that uses scale (1 - 10)
-                            student[self.clean(headings[i])] = int(qst[1]["mult"]) * int(response[i]) #scale factor * selected scale value
-                        elif qst[0] == "fr": #ignore free response questions for now...
-                            pass
+                elif qst[0] == "sc": #handle question that uses scale (1 - 10)
+                    student[self.clean(headings[i])] = int(qst[1]["mult"]) * int(response[i]) #scale factor * selected scale value
+                elif qst[0] == "fr": #ignore free response questions for now...
+                    pass
             
             gradeSheet = (username, partner, student)
             self.surveyResults.append(gradeSheet)
